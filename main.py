@@ -3,16 +3,16 @@ from pandas import *
 
 def formate_datas(csv_file):
     df = pandas.read_csv(csv_file, low_memory=False, header=0)
-    df = df[['From', 'To', 'Subject', 'X-cc', 'content']]
+
+    df = df[['Message-ID', 'From', 'To', 'Subject', 'content']]
 
     unwanted_ids = []
     for index, row in df.iterrows():
-        if isinstance(row['content'], float):
-                if isinstance(row['content'], float) :
-                    if isinstance(row['X-cc'], float):
-                        unwanted_ids.append(index)
-                    elif row['X-cc'].startswith('---------------------- Forwarded by'):
-                        unwanted_ids.append(index)
+        if not(row['Message-ID'].startswith('<')):
+            unwanted_ids.append(index)
+        elif isinstance(row['content'], float):
+                if isinstance(row['Subject'], float):
+                    unwanted_ids.append(index)
         elif row['content'].startswith('---------------------- Forwarded by'):
             unwanted_ids.append(index)
 
