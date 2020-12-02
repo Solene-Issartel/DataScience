@@ -1,10 +1,9 @@
 from pandas import *
 
-
 def formate_datas(csv_file):
     df = pandas.read_csv(csv_file, low_memory=False, header=0)
 
-    df = df[['Message-ID', 'From', 'To', 'Subject', 'content']]
+    df = df[['Message-ID', 'From', 'To', 'Subject', 'Content']]
 
     unwanted_ids = []
     for index, row in df.iterrows():
@@ -18,7 +17,6 @@ def formate_datas(csv_file):
 
     new_df = df.drop(unwanted_ids)
     return (new_df)
-
 
 if __name__ == '__main__':
     df = formate_datas("data/donnees_data_science.csv")
