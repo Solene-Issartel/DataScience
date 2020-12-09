@@ -3,7 +3,7 @@ from pandas import *
 def formate_datas(csv_file):
     df = pandas.read_csv(csv_file, low_memory=False, header=0)
 
-    df = df[['Message-ID', 'From', 'To', 'Subject', 'Content']]
+    df = df[['Message-ID', 'From', 'To', 'Subject', 'content']]
 
     unwanted_ids = []
     for index, row in df.iterrows():
@@ -12,8 +12,6 @@ def formate_datas(csv_file):
         elif isinstance(row['content'], float):
                 if isinstance(row['Subject'], float):
                     unwanted_ids.append(index)
-        elif row['content'].startswith('---------------------- Forwarded by'):
-            unwanted_ids.append(index)
 
     new_df = df.drop(unwanted_ids)
     return (new_df)
