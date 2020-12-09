@@ -1,6 +1,5 @@
 import pandas as pandas
 import re
-import sklearn as sk
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
