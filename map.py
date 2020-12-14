@@ -21,7 +21,7 @@ def split_row(df,col,nameFile):
     #Split chaque String de chaque ligne, ce qui va créer des tableaux de string
     #On supprime les lignes étant des stop words ou étant des nombres
     df[col] = df[col].str.split("\ |\:|\!|\?|\-|\"|\(|\)|\[|\]|\<|\>|\@|\&|\/|\,|\=|\.|\#|\n|\t")
-    df[col] = df[col].apply(lambda x: [item for item in x if item not in stop and not bool(re.search("[0-9]+", item))])
+    df[col] = df[col].apply(lambda x: [item for item in x if item not in stop and len(item) > 1 and not bool(re.search("[0-9]+", item))])
 
     #On va l'exploser, donc ajouter pour chaque string dans
     #les listes une nouvelle ligne avec juste un string
