@@ -5,16 +5,11 @@ nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 
-#Permet de split et d'avoir une ligne par string
-from sklearn.feature_extraction.text import CountVectorizer
-
-
 def split_row(df,col,nameFile):
     stop = stopwords.words('english')
-    stop.append('fw')
-    #stop.append(r'[0-9]*')
+    more_stopwords = ["fw","etc","com","fr"]
+    stop = stop + more_stopwords
     print(stop)
-
     #On met tout en minuscule
     df[col] = df[col].str.lower()
 
