@@ -60,9 +60,11 @@ def associate_to_mails():
 
     # On a fini d'attribuer les différentes thématiques aux mails
     mailsThematiques = pandas.DataFrame(mailsThematiques, columns = ["idEmail","Thematiques"])
-    mailsThematiques.to_csv("data/mails_thematiques.csv")
+    mailsThematiques.to_csv("data/mails_thematiquesV2.csv")
     stop_time = time.time()
     print("\nTemps de calcul = %f secondes" % (stop_time - start_time))
+    print("Nous avons %d mails comportant des thématiques sur %d mails au départ" % (len(mailsThematiques),len(df)))
+
 
 if __name__ == '__main__':
     associate_to_mails()

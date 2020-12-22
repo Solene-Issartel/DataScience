@@ -29,8 +29,11 @@ def associate_to_mails():
         columns.append(thematiques)
     # les mails avec leurs thématiques
     mailsThematiques = pandas.DataFrame(columns=columns)
+    nbMail = 0
     # Pour chaque mail
     for mailTraite in df.iterrows():
+        nbMail += 1
+        print(nbMail)
         mailTraite[1].str.lower()
         # On crée une nouvelle ligne
         newMailRow = emptyRow
@@ -61,12 +64,13 @@ def associate_to_mails():
                         exist = True
                         newMailRow[thematique] = 1
                     count += 1
-            # Puis on ajoute notre mail avec ses thématiques dans le dataframe
+        # Puis on ajoute notre mail avec ses thématiques dans le dataframe
         mailsThematiques = pandas.concat([mailsThematiques, newMailRow], ignore_index=True)
     # On a fini d'attribuer les différentes thématiques aux mails
-    mailsThematiques.to_csv("data/mails_thematiques.csv")
+    mailsThematiques.to_csv("data/mails_thematiquesV1.csv")
     stop_time = time.time()
     print("\nTemps de calcul = %f secondes" % (stop_time - start_time))
+    print("Nous avons %d mails comportant des thématiques sur %d mails au départ" % (len(mailsThematiques),len(df)))
 
 if __name__ == '__main__':
     associate_to_mails()

@@ -3,7 +3,10 @@ from nltk.corpus import wordnet
 from pandas import *
 import time
 
-# Un peu comme une méthode k-means
+## Un peu comme une méthode k-means permettant de regrouper les mots les plus proches ##
+## selon leur similarité. On ne sait pas à l'avance quels mots vont se retrouver avec ##
+## quels mots.                                                                        ##
+
 def create_thematiques(col,df):
     start_time = time.time()
     # La liste qui contiendra les thématiques avec tous leurs mots associées
@@ -76,12 +79,6 @@ def create_thematiques(col,df):
     print("Nous passons de %d à %d thématiques " % (len(df[col]), len(realThematiques)))
     return realThematiques
 
-#def remove_useless_synsets(thematiques):
-    # On ne veut pas garder les synonymes n'apparaîssant pas réellement dans les mots
-    # associés aux thématiques
-    # for index, row in thematiques.iterrows():
-
-
 def extractThematique(thematiques):
     for i in range(0,len(thematiques)):
         # On récupère les thématiques en dataframe
@@ -107,6 +104,3 @@ if __name__ == '__main__':
     thematiques1 = extractThematique(thematiques1)
     thematiques1 = pandas.DataFrame(thematiques1, columns=["mainThematique","wordsAssociated"])
     thematiques1.to_csv("data/clean_thematiques.csv")
-
-    for theme in thematiques1:
-        print(theme)
