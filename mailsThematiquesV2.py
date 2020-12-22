@@ -1,8 +1,7 @@
 from pandas import *
-import numpy as np
 import time
 
-## IDMAIL + des 0 et des 1 selon si le mail a ou non des thématiques ##
+## IDMAIL + les thématiques dans un tableau ##
 
 # Récupérer les mots associés à la thématique
 def retrieve_associated_words(stringToChange):
@@ -20,24 +19,18 @@ def associate_to_mails():
     df = pandas.read_csv("data/formatted_data.csv", low_memory=False, header=0)
     df = df[['Subject']].dropna()
     df1 = pandas.read_csv("data/clean_thematiques.csv", low_memory=False, header=0)
-    columns = ["IDmail"]
-    # Une ligne vide, qui va ensuite prendre les informations du mail
-    emptyRow = [0]
-    # On récupère les différentes thématiques
-    for thematiques in df1["mainThematique"]:
-        emptyRow.append(0)
-        columns.append(thematiques)
     # les mails avec leurs thématiques
-    mailsThematiques = pandas.DataFrame(columns=columns)
+    mailsThematiques = []
+    nbMail = 0
     # Pour chaque mail
     for mailTraite in df.iterrows():
+        nbMail += 1
+        print(nbMail)
         mailTraite[1].str.lower()
         # On crée une nouvelle ligne
-        newMailRow = emptyRow
-        # On en fait un dataframe comprenant toutes les colonnes voulues
-        newMailRow = pandas.DataFrame(data=np.array([newMailRow]), columns=columns)
+        newMailRow = []
         # On indique quel mail on traite, on récupère son id
-        newMailRow["IDmail"] = mailTraite[0]
+        idMail = mailTraite[0]
         # Pour chaque thématique existante
         for rowThemes in df1.iterrows():
             # La thématique que l'on traite
@@ -48,7 +41,7 @@ def associate_to_mails():
             wordsAssociated = retrieve_associated_words(rowThemes[1].wordsAssociated)
             # On regarde si la thématique est présente
             if(thematique in subject):
-                newMailRow[thematique] = 1
+                newMailRow.append(thematique)
             # Sinon on regarde si un des mots proches est présents
             else:
                 exist = False
@@ -59,11 +52,14 @@ def associate_to_mails():
                     if (wordsAssociated[count] in subject):
                         # Oui, on indique que le mail est de cette thématique
                         exist = True
-                        newMailRow[thematique] = 1
+                        newMailRow.append(thematique)
                     count += 1
-            # Puis on ajoute notre mail avec ses thématiques dans le dataframe
-        mailsThematiques = pandas.concat([mailsThematiques, newMailRow], ignore_index=True)
+        # Puis on ajoute notre mail avec ses thématiques dans le tableau (seulement s'il en a)
+        if newMailRow:
+            mailsThematiques.append((idMail,newMailRow))
+
     # On a fini d'attribuer les différentes thématiques aux mails
+    mailsThematiques = pandas.DataFrame(mailsThematiques, columns = ["idEmail","Thematiques"])
     mailsThematiques.to_csv("data/mails_thematiques.csv")
     stop_time = time.time()
     print("\nTemps de calcul = %f secondes" % (stop_time - start_time))
