@@ -98,7 +98,7 @@ def extractThematique(thematiques):
     return thematiques
 
 if __name__ == '__main__':
-    df1 = pandas.read_csv("data/map_reduced_subject.csv", low_memory=False, header=0)
+    df1 = pandas.read_csv("visualisation/data/map_reduced_subject.csv", low_memory=False, header=0)
 
     thematiques1 = create_thematiques("Subject",df1)
     thematiques1 = extractThematique(thematiques1)

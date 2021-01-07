@@ -17,9 +17,9 @@ def retrieve_associated_words(stringToChange):
 # Selon son sujet
 def associate_to_mails():
     start_time = time.time()
-    df = pandas.read_csv("data/formatted_data.csv", low_memory=False, header=0)
+    df = pandas.read_csv("visualisation/data/formatted_data.csv", low_memory=False, header=0)
     df = df[['Subject']].dropna()
-    df1 = pandas.read_csv("data/clean_thematiques.csv", low_memory=False, header=0)
+    df1 = pandas.read_csv("visualisation/data/clean_thematiques.csv", low_memory=False, header=0)
     columns = ["IDmail"]
     # Une ligne vide, qui va ensuite prendre les informations du mail
     emptyRow = [0]

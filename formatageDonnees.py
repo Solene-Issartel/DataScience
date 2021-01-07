@@ -17,5 +17,5 @@ def formate_datas(csv_file):
     return (new_df)
 
 if __name__ == '__main__':
-    df = formate_datas("data/donnees_data_science.csv")
+    df = formate_datas("visualisation/data/donnees_data_science.csv")
     df.to_csv("data/formatted_data.csv")

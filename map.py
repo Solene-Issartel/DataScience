@@ -40,7 +40,7 @@ def split_row(df,col,nameFile):
     print(type(grouped_df))
 
 if __name__ == '__main__':
-    df = pandas.read_csv("data/formatted_data.csv", low_memory=False, header=0)
+    df = pandas.read_csv("visualisation/data/formatted_data.csv", low_memory=False, header=0)
     df1 = df[['Subject']].dropna()
     print(df1)
     split_row(df1,'Subject',"data/map_reduced_subject.csv")
