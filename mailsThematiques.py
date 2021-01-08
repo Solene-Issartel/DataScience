@@ -13,11 +13,11 @@ def retrieve_associated_words(stringToChange):
     wordsAssociated = wordsAssociated.split(" ")
     return wordsAssociated
 
-# Selon son sujet
+# Selon son sujet²²
 def associate_to_mails():
     start_time = time.time()
     df = pandas.read_csv("visualisation/data/formatted_data.csv", low_memory=False, header=0)
-    df = df[['Subject']].dropna()
+    df = df[['From', 'Subject']].dropna()
     df1 = pandas.read_csv("visualisation/data/clean_thematiques.csv", low_memory=False, header=0)
     # les mails avec leurs thématiques
     mailsThematiques = []
@@ -31,6 +31,7 @@ def associate_to_mails():
         newMailRow = []
         # On indique quel mail on traite, on récupère son id
         idMail = mailTraite[0]
+        From = mailTraite[1].From
         # Pour chaque thématique existante
         for rowThemes in df1.iterrows():
             # La thématique que l'on traite
@@ -56,11 +57,11 @@ def associate_to_mails():
                     count += 1
         # Puis on ajoute notre mail avec ses thématiques dans le tableau (seulement s'il en a)
         if newMailRow:
-            mailsThematiques.append((idMail,newMailRow))
+            mailsThematiques.append((idMail, From, newMailRow))
 
     # On a fini d'attribuer les différentes thématiques aux mails
-    mailsThematiques = pandas.DataFrame(mailsThematiques, columns = ["idEmail","Thematiques"])
-    mailsThematiques.to_csv("data/mails_thematiquesV2.csv")
+    mailsThematiques = pandas.DataFrame(mailsThematiques, columns = ["idEmail","From","Thematiques"])
+    mailsThematiques.to_csv("visualisation/data/mails_thematiques.csv")
     stop_time = time.time()
     print("\nTemps de calcul = %f secondes" % (stop_time - start_time))
     print("Nous avons %d mails comportant des thématiques sur %d mails au départ" % (len(mailsThematiques),len(df)))

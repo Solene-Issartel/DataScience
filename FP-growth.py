@@ -13,7 +13,7 @@ def retrieve_thematiques(stringToChange):
     return wordsAssociated
 
 if __name__ == '__main__':
-    df1 = pandas.read_csv("visualisation/data/mails_thematiquesV2.csv", low_memory=False, header=0)
+    df1 = pandas.read_csv("visualisation/data/mails_thematiques.csv", low_memory=False, header=0)
     itemsets = []
     # Pour chaque mail, on récupère ses thématiques
     for mailTraite in df1['Thematiques']:
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     patterns_df = patterns_df.drop(unwanted_patterns)
     patterns_df = patterns_df.rename(columns={"pattern": "Thématiques souvent associées", "count": "Nombre d\'occurences"})
     print(patterns_df)
-    patterns_df.to_csv("data/itemsetsFrequents.csv")
+    patterns_df.to_csv("visualisation/data/itemsetsFrequents.csv")
 
     # Nous allons calculer le lift de ces règles
     rules_df = pandas.DataFrame(columns=['A','B','confiance','support','lift'])
@@ -118,4 +118,4 @@ if __name__ == '__main__':
     rules_df['lift'] = rules_df["confiance"] / rules_df["support"]
     rules_df.sort_values(by=['lift'])
 
-    rules_df.to_csv("data/reglesEtCalculs.csv")
+    rules_df.to_csv("visualisation/data/reglesEtCalculs.csv")

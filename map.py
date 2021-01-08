@@ -3,7 +3,7 @@ import re
 
 
 def split_row(df,col,nameFile):
-    stopwords = open(r"data/stopwords")
+    stopwords = open(r"visualisation/data/stopwords.txt")
     stop = stopwords.readline()
     stopwords.close()
     print(stop)
@@ -40,8 +40,4 @@ if __name__ == '__main__':
     df = pandas.read_csv("visualisation/data/formatted_data.csv", low_memory=False, header=0)
     df1 = df[['Subject']].dropna()
     print(df1)
-    split_row(df1,'Subject',"data/map_reduced_subject.csv")
-
-    #df2 = df[['content']].dropna()
-    #print(df2)
-    #split_row(df2,'content',"data/map_reduced_content.csv")
+    split_row(df1, 'Subject', "visualisation/data/map_reduced_subject.csv")

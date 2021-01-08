@@ -103,4 +103,4 @@ if __name__ == '__main__':
     thematiques1 = create_thematiques("Subject",df1)
     thematiques1 = extractThematique(thematiques1)
     thematiques1 = pandas.DataFrame(thematiques1, columns=["mainThematique","wordsAssociated"])
-    thematiques1.to_csv("data/clean_thematiques.csv")
+    thematiques1.to_csv("visualisation/data/clean_thematiques.csv")
