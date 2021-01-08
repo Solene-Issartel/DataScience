@@ -1,14 +1,11 @@
 import pandas as pandas
 import re
-import nltk
-nltk.download('stopwords')
-from nltk.corpus import stopwords
 
 
 def split_row(df,col,nameFile):
-    stop = stopwords.words('english')
-    more_stopwords = ["fw","etc","com","fr"]
-    stop = stop + more_stopwords
+    stopwords = open(r"data/stopwords")
+    stop = stopwords.readline()
+    stopwords.close()
     print(stop)
     #On met tout en minuscule
     df[col] = df[col].str.lower()
@@ -31,7 +28,7 @@ def split_row(df,col,nameFile):
 
     #On trie par ordre décroissant
     grouped_df = grouped_df.sort_values(by=["count"], ascending=False)
-    grouped_df = grouped_df.query('count>=100')
+    grouped_df = grouped_df.query('count>=200')
     grouped_df.to_csv(nameFile)
     print(grouped_df)
 
