@@ -39,7 +39,7 @@ def extract_data(csv_file):
 
 # Return le tableau de contingence sur lequel on déroulera l'AFC
 # Les expéditeurs et les thématiques de leurs mails envoyés
-def tableauAFC(dataframe):
+def tableau_acp(dataframe):
     df1 = pandas.read_csv("visualisation/data/clean_thematiques.csv", low_memory=False, header=0)
     columns = []
     # Une ligne vide, qui va ensuite prendre les thématiques associées à l'expéditeur
@@ -71,40 +71,29 @@ def tableauAFC(dataframe):
     return expThematiques
 
 
-def plot_factor_variable():
-    plt.figure(figsize=(10, 10))
-    plt.rcParams.update({'font.size': 14})
+def acp(tab_acp):
+    columns = tab_acp.columns.values
+    X = tab_acp
+    # nombre d'observations
+    n = X.shape[0]
+    # nombre de variables
+    p = X.shape[1]
+    # instanciation
+    sc = StandardScaler()
+    # transformation – centrage
+    Z = sc.fit_transform(X)
+    acp = PCA(svd_solver='full')
+    coord = acp.fit_transform(Z)
+    eigenvalues = acp.explained_variance_ratio_[:10]
+    eigEx = acp.explained_variance_
+    plot_valeurs_propres(eigenvalues)
+    plot_factor_variable2(X,eigEx,eigenvalues,n,p,acp)
 
-    #
-    x = np.linspace(start=-1, stop=1, num=500)
-    y_positive = lambda x: np.sqrt(1 - x ** 2)
-    y_negative = lambda x: -np.sqrt(1 - x ** 2)
-    plt.plot(x, list(map(y_positive, x)), color='maroon')
-    plt.plot(x, list(map(y_negative, x)), color='maroon')
-
-    x = np.linspace(start=-0.5, stop=0.5, num=500)
-    y_positive = lambda x: np.sqrt(0.5 ** 2 - x ** 2)
-    y_negative = lambda x: -np.sqrt(0.5 ** 2 - x ** 2)
-    plt.plot(x, list(map(y_positive, x)), color='maroon')
-    plt.plot(x, list(map(y_negative, x)), color='maroon')
-
-def afc(tabAFC):
-    # On transforme notre tableau en matrice
-    x = tabAFC.values
-    pca = PCA(n_components=66)
-    pca.fit(x)
-    # Donne les vecteurs des valeurs propres
-    coord = pca.components_
-    # Donne les valeurs propres
-    eigenvalues = pca.explained_variance_ratio_
-    # La plupart des valeurs propres est très petite, on garde seulement
-    # les plus grandes
-    filter_arr = eigenvalues > 0.01
-    eigenvalues = eigenvalues[filter_arr]
-    print(eigenvalues)
-    # Diagramme en barre des valeurs propres
+# Diagramme en barre des valeurs propres
+def plot_valeurs_propres(eigenvalues):
     fig = px.bar(eigenvalues)
     fig.show()
+
 
 def nuages_individus1(tablePCA):
     sc = StandardScaler()  # transformation–centrage-réduction
@@ -145,8 +134,43 @@ def nuages_individus(tabAFC):
     plt.show()
 
 
+# Nuage des variables
+def plot_factor_variable2(X,eigEx,eigenvalues,n,p,acp):
+    eigval = (n - 1) / n * eigEx
+    sqrt_eigval = np.sqrt(eigval)
+    corvar = np.zeros((p, p))
+    for k in range(p):
+        corvar[:, k] = acp.components_[k, :] * sqrt_eigval[k]
+
+    # cercle des corrélations
+    fig, axes = plt.subplots(figsize=(8, 8))
+    axes.set_xlim(-1, 1)
+    axes.set_ylim(-1, 1)
+    # affichage des étiquettes (noms des variables)
+    for j in range(p):
+        plt.arrow(0, 0,
+                  dx=corvar[j, 0], dy=corvar[j, 1],
+                  head_width=0.03, head_length=0.03,
+                  length_includes_head=True)
+        plt.annotate(X.columns[j], (corvar[j, 0], corvar[j, 1]))
+
+    # ajouter les axes
+    plt.plot([-1, 1], [0, 0], color='silver', linestyle='-', linewidth=1)
+    plt.plot([0, 0], [-1, 1], color='silver', linestyle='-', linewidth=1)
+
+    # ajouter un cercle
+    cercle = plt.Circle((0, 0), 1, color='black', fill=False)
+    axes.add_artist(cercle)
+
+    plt.xlabel(f"Dim 1 ({round(eigenvalues[0] * 100,2)}%)")
+    plt.ylabel(f"Dim 2 ({round(eigenvalues[1] * 100,2)}%)")
+    plt.title('Variable factor map (PCA)')
+    # affichage
+    plt.show()
+
 if __name__ == '__main__':
     df = extract_data("visualisation/data/mails_thematiques.csv")
-    df = tableauAFC(df)
-    df.to_csv("visualisation/data/extracted_datas.csv")
+    df = tableau_acp(df)
+    df.to_csv("visualisation/data/extracted_data.csv")
     nuages_individus1(df)
+    acp(df)
