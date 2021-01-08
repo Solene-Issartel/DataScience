@@ -1,6 +1,7 @@
 from pandas import *
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 import plotly.express as px
 import matplotlib.pyplot as plt
 
@@ -105,8 +106,47 @@ def afc(tabAFC):
     fig = px.bar(eigenvalues)
     fig.show()
 
+def nuages_individus1(tablePCA):
+    sc = StandardScaler()  # transformation–centrage-réduction
+    Z = sc.fit_transform(tablePCA)
+    print(Z)
+    acpp = PCA(n_components=10)
+    coord = acpp.fit_transform(Z)
+
+    #positionnement des individus dans lepremier plan
+    fig, axes = plt.subplots(figsize=(15,15))
+    axes.set_xlim(-4,33) #même limites en abscisse
+    axes.set_ylim(-4,20) #et en ordonnée
+    # #placement des étiquettes des observations
+    n=66
+    for i in range(n):
+        plt.annotate(tablePCA.index[i],(coord[i,0],coord[i,1]))#ajouter les axes
+    plt.plot([-4,33],[0,0],color='silver',linestyle='-',linewidth=1)
+    plt.plot([0,0],[-4,33],color='silver',linestyle='-',linewidth=1)#affichage
+    plt.show()
+
+def nuages_individus(tabAFC):
+    columns = tabAFC.columns.values
+    # Centré et réduire les données
+    scaler = StandardScaler()
+    scaler.fit(tabAFC)
+    Z = scaler.transform(tabAFC)
+
+    # ACP
+    acp = PCA(n_components=10)
+    coord = acp.fit_transform(Z)
+    acp.fit(Z)
+    results = acp.fit_transform(Z)
+    # #placement des étiquettes des observations
+    n = 66
+    for i in range(n):
+        plt.annotate(tabAFC.index[i], (coord[i, 0], coord[i, 1]))  # ajouter les axes
+    plt.scatter(coord[:, 0], coord[:, 1])
+    plt.show()
+
 
 if __name__ == '__main__':
     df = extract_data("visualisation/data/mails_thematiques.csv")
     df = tableauAFC(df)
-    afc(df)
+    df.to_csv("visualisation/data/extracted_datas.csv")
+    nuages_individus1(df)
