@@ -1,7 +1,8 @@
 from pandas import *
 import numpy as np
-from fanalysis.ca import CA
-
+from sklearn.decomposition import PCA
+import plotly.express as px
+import matplotlib.pyplot as plt
 
 # Récupérer les thématiques associées à un mail
 def retrieve_thematiques(stringToChange):
@@ -16,12 +17,12 @@ def retrieve_thematiques(stringToChange):
 
 def extract_data(csv_file):
     df = pandas.read_csv(csv_file, low_memory=False, header=0)
-    df = df[['From','Thematiques']]
-    thematiques =[]
+    df = df[['From', 'Thematiques']]
+    thematiques = []
     for row in df['Thematiques']:
         thematiques.append(retrieve_thematiques(row))
-    df['Thematiques']=thematiques
-    new_df = df.groupby(['From'], sort=False)['Thematiques'].apply(lambda x : x.sum())
+    df['Thematiques'] = thematiques
+    new_df = df.groupby(['From'], sort=False)['Thematiques'].apply(lambda x: x.sum())
     list_dic = []
     for personne in new_df:
         compte = {k: personne.count(k) for k in set(personne)}
@@ -69,19 +70,40 @@ def tableauAFC(dataframe):
     return expThematiques
 
 
+def plot_factor_variable():
+    plt.figure(figsize=(10, 10))
+    plt.rcParams.update({'font.size': 14})
+
+    #
+    x = np.linspace(start=-1, stop=1, num=500)
+    y_positive = lambda x: np.sqrt(1 - x ** 2)
+    y_negative = lambda x: -np.sqrt(1 - x ** 2)
+    plt.plot(x, list(map(y_positive, x)), color='maroon')
+    plt.plot(x, list(map(y_negative, x)), color='maroon')
+
+    x = np.linspace(start=-0.5, stop=0.5, num=500)
+    y_positive = lambda x: np.sqrt(0.5 ** 2 - x ** 2)
+    y_negative = lambda x: -np.sqrt(0.5 ** 2 - x ** 2)
+    plt.plot(x, list(map(y_positive, x)), color='maroon')
+    plt.plot(x, list(map(y_negative, x)), color='maroon')
+
 def afc(tabAFC):
     # On transforme notre tableau en matrice
-    X = tabAFC.values
-    X = np.array(X, dtype=np.float64)
-    print(X)
-    my_ca = CA(row_labels=tabAFC.index.values, col_labels=tabAFC.columns.values)
-    # On réalise l'AFC
-    my_ca.fit(X)
-    # Les valeurs propres
-    print(my_ca.eig_)
-    my_ca.plot_eigenvalues()
-    # Représentations sur les deux premiers axes
-    my_ca.mapping(num_x_axis=1, num_y_axis=2)
+    x = tabAFC.values
+    pca = PCA(n_components=66)
+    pca.fit(x)
+    # Donne les vecteurs des valeurs propres
+    coord = pca.components_
+    # Donne les valeurs propres
+    eigenvalues = pca.explained_variance_ratio_
+    # La plupart des valeurs propres est très petite, on garde seulement
+    # les plus grandes
+    filter_arr = eigenvalues > 0.01
+    eigenvalues = eigenvalues[filter_arr]
+    print(eigenvalues)
+    # Diagramme en barre des valeurs propres
+    fig = px.bar(eigenvalues)
+    fig.show()
 
 
 if __name__ == '__main__':
