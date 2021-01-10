@@ -37,6 +37,14 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
+
+footer = html.Footer(id="footer", children=[
+    html.Hr(),
+    html.H6('Luc Raymond'),
+    html.H6('Solène Issartel'),
+    html.H6('Laura Biasibetti')],
+    style=FOOTER_STYLE)
+
 # Notre menu de navigation à gauche
 sidebar = html.Div(
     [
@@ -51,11 +59,13 @@ sidebar = html.Div(
                 dbc.NavLink("1- Formatage des données", href="/formatage", active="exact"),
                 dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact"),
                 dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact"),
-                dbc.NavLink("N- Patterns Fréquents", href="patternsFrequents", active="exact")
+                dbc.NavLink("N- Patterns Fréquents", href="/patternsFrequents", active="exact"),
+                dbc.NavLink("X- ACP", href="/acp", active="exact")
             ],
             vertical=True,
             pills=True,
         ),
+        footer
     ],
     style=SIDEBAR_STYLE,
 )
@@ -69,12 +79,6 @@ header = html.Header(id="header", children=[
     html.H1(children='Projet DATA SCIENCE'),
     html.Hr()
 ])
-# Notre footer présent sur toutes les pages
-footer = html.Footer(id="footer", children=[
-    html.Hr(),
-    html.H6(children='par Luc Raymond, Solène Issartel, Laura Biasibetti')],
-    style=FOOTER_STYLE)
-
 
 # Toute notre application
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
@@ -316,6 +320,16 @@ tab_exp_thematiques_acp = html.Div(children=[
                 )
             ])
 
+layoutNuageInd = html.Div([
+    html.H3("Nuage des individus"),
+    html.Img(src=app.get_asset_url('nuageIndiv.png'))
+])
+
+layoutNuageVar = html.Div([
+    html.H3("Nuage des variables"),
+    html.Img(src=app.get_asset_url('nuageVar.png'))
+])
+
 # Permet de mettre à jour la page selon le lien
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
@@ -323,32 +337,33 @@ def render_page_content(pathname):
         return html.Div(children=[
             header,
             html.H4('Présentation'),
-            presentation,
-            footer
+            presentation
         ])
     elif pathname == "/formatage":
         return html.Div(children=[
             header,
-            formatage_page,
-            footer
+            formatage_page
         ])
     elif pathname == "/mapReduce":
         return html.Div(children=[
             header,
-            map_reduce_page,
-            footer
+            map_reduce_page
         ])
     elif pathname == "/extractThematiques":
         return html.Div(children=[
             header,
-            extract_thematiques_page,
-            footer
+            extract_thematiques_page
         ])
     elif pathname == "/patternsFrequents":
         return html.Div(children=[
             header,
-            patternsFrequents,
-            footer
+            patternsFrequents
+        ])
+    elif pathname == "/acp":
+        return html.Div(children=[
+            header,
+            layoutNuageInd,
+            layoutNuageVar
         ])
     # Si l'utilisateur veut rejoindre une page non existante
     return dbc.Jumbotron(
