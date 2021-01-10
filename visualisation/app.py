@@ -49,7 +49,8 @@ sidebar = html.Div(
             [
                 dbc.NavLink("Home", href="/", active="exact"),
                 dbc.NavLink("1- Formatage des données", href="/formatage", active="exact"),
-                dbc.NavLink("X- Thématiques", href="/thematiquesCount", active="exact"),
+                dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact"),
+                dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact"),
                 dbc.NavLink("N- Patterns Fréquents", href="patternsFrequents", active="exact")
             ],
             vertical=True,
@@ -58,7 +59,6 @@ sidebar = html.Div(
     ],
     style=SIDEBAR_STYLE,
 )
-
 
 # Permet de mettre le style du contenu pour chaque page
 content = html.Div(id="page-content", style=CONTENT_STYLE)
@@ -78,7 +78,6 @@ footer = html.Footer(id="footer", children=[
 
 # Toute notre application
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
-
 
 # Presentation dans la rubrique Home
 cardPresentationUs = dbc.Card(
@@ -120,7 +119,6 @@ def extractThemsCount():
     with open('data/clean_thematiques.csv', newline='') as f:  # Ouverture du fichier CSV
         read = csv.reader(f)  # chargement des lignes du fichier csv
         columns_name = ["Thématiques", "Nombre de mots"]
-        print(columns_name)
         themes = []
         length = []
         i = 0
@@ -135,8 +133,9 @@ def extractThemsCount():
                 length.append(len((line[2]).split(",")))
         sorted_dic = sorted(dic.items(), key=lambda item: item[1], reverse=True)
         final_dic = {k: v for k, v in sorted_dic}
-        print(final_dic)
     return [columns_name, final_dic]
+
+
 def extractTabThemsCount(number):
     datas = extractThemsCount()
     dic = dict(itertools.islice(datas[1].items(), number))
@@ -152,11 +151,136 @@ df = pd.DataFrame({
 figThematique = px.bar(df, x=data[0][0], y=data[0][1])
 
 thematiquesCount = html.Div(children=[
-    html.H5(children='Analyse des thématiques abordées ensemble dans les mails'),
+    html.H5(children='Les premières thématiques avec le nombre de mots la composant'),
     dcc.Graph(
         figure=figThematique
     )])
 
+# La page de formatage des données
+donnees_brutes = pd.read_csv("data/donnees_data_science.csv")
+donnees_formatees = pd.read_csv("data/formatted_data.csv")
+formatage_page = html.Div(children=[
+    html.H2('1- Formatage des Données'),
+    html.H3('1) Suppression des mails n\'étant pas sous un bon format'),
+    html.Ul(children=[
+        html.Li("On garde seulement les colonnes 'id', 'From', 'To', 'Subject' et 'Content', "
+                "les autres ne nous seront pas utiles par la suite."),
+        html.Li("Formatage des noms des expéditeurs sous la forme début_mail(@mail.com), "
+                "par exemple, “phillip.allen@enron.com” devient phillip.allen."),
+        html.Li("Suppression des mails qui ne sont pas au bon format de données (décalages, lignes vides etc.)."),
+        html.Li("Suppression des mails qui ne comportent ni contenu ni sujet.")
+    ]),
+    html.Hr(),
+    html.P("Nous nous retrouvons avec %d mails, au lieu de %d mails." % (len(donnees_formatees), len(donnees_brutes))),
+    html.P("Les données semblaient assez \"propres\", car nous avons retirés que très peu de mails."),
+    html.H3('2) Aperçu de nos données formatées'),
+    dt.DataTable(
+        id='tabDataFormated',
+        style_cell={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+            'textOverflow': 'ellipsis',
+            'maxWidth': 0,
+            'textAlign': 'left'
+        },
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        },
+        columns=[{"name": i, "id": i} for i in donnees_formatees.iloc[:, 1:6]],
+        data=donnees_formatees.head().to_dict('records'),
+        sort_action="native"
+    ),
+    html.Hr(),
+])
+
+# La page présentant le map reduce
+map_reduce_data = pd.read_csv("data/map_reduced_subject.csv")
+map_reduce_page = html.Div(children=[
+    html.H2('2- Création de thématiques avec MapReduce :'),
+    html.H3('1) Les différentes étapes de notre MapReduce'),
+    html.Ul(children=[
+        html.Li("1 Récupération du sujet de tous les mails,"),
+        html.Li("2 Suppression des lignes vides (Pas de sujet),"),
+        html.Li("3 Passage des sujets en minuscules, puis split de chaque mot (Nous nous retrouvons avec "
+                "une grande liste de tous les mots rencontrés dans les sujets des mails),"),
+        html.Li("4 Enlever les mots inutiles (stop-words),"),
+        html.Li("5 Associer un 1 pour chaque mot,"),
+        html.Li("6 Réduire les mots identiques et additionner le compteur,"),
+        html.Li("7 Garder uniquement les mots apparaissant au moins 200 fois,")
+    ]),
+    html.Hr(),
+    html.P("Nous nous retrouvons avec %d mots différents." % (len(map_reduce_data))),
+    html.H3('2) Aperçu des mots ressortant les plus dans les mails'),
+    dt.DataTable(
+        id='tabDataMapReduce',
+        style_cell={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+            'textOverflow': 'ellipsis',
+            'maxWidth': 0,
+            'textAlign': 'left'
+        },
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        },
+        columns=[{"name": i, "id": i} for i in map_reduce_data.columns],
+        data=map_reduce_data[:20].to_dict('records'),
+        sort_action="native"
+    ),
+    html.Hr(),
+    html.H3('3) Critique de notre MapReduce'),
+    html.Ul(children=[
+        html.Li("Toujours des mots ayant peu d'intérêt ('fwd' par exemple), mais peu,"),
+        html.Li("Utilisation seulement du sujet des mails, et non pas du contenu => Pertinence des mots récupérés ?")
+    ]),
+    html.Hr(),
+])
+
+# La page présentant les thématiques clean
+clean_thematiques_data = pd.read_csv("data/clean_thematiques.csv")
+extract_thematiques_page = html.Div(children=[
+    html.H2('3- Extraction des thématiques : clustering'),
+    html.H3('1) Les différentes étapes de regroupement des mots'),
+    html.Ul(children=[
+        html.Li("1 On passe nos mots au singulier, pour éviter les doublons,"),
+        html.Li("2 Mot proche d'un des autres mots, ou de ses synonymes ? (Librairie WordNet pour avoir la similarité"
+                " entre 2 mots, et les synonymes d'un mot),"),
+        html.Li("- Oui, alors on les regroupe ensemble, "),
+        html.Li("- Non, alors on crée une nouvelle thématique comprenant ce mot,"),
+        html.Li("3 Le mot du cluster ressortant le plus donnera son nom à la thématique,")
+    ]),
+    html.Hr(),
+    html.P("Nous nous retrouvons avec %d thématiques différents." % (len(clean_thematiques_data))),
+    html.H3('2) Aperçu des premières thématiques extraites'),
+    dt.DataTable(
+        id='tabDataThematiques',
+        style_cell={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+            'textOverflow': 'ellipsis',
+            'maxWidth': 0,
+            'textAlign': 'left'
+        },
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        },
+        columns=[{"name": i, "id": i} for i in clean_thematiques_data.iloc[:1:3]],
+        data=clean_thematiques_data[:20].to_dict('records'),
+        sort_action="native"
+    ),
+    html.Hr(),
+    html.H3('3) Critique de notre extraction de thématiques'),
+    html.Ul(children=[
+        html.Li("Mots proches si au moins 65% similaires (faible) => des mots regroupés ensembles"
+                " qui ne devraient pas vraiment l'être (trop de mots dans une thématique),"),
+        html.Li("Beaucoup de thématiques composées d'un seul mot")
+    ]),
+    thematiquesCount,
+    html.Hr(),
+])
 
 # La page pour les patterns fréquents
 itemsets = pd.read_csv("data/itemsetsFrequents.csv", low_memory=False, header=0)
@@ -167,9 +291,30 @@ patternsFrequents = html.Div(children=[
                     columns=[{"name": i, "id": i} for i in itemsets.iloc[:, 1:3]],
                     data=itemsets.to_dict('records'),
                     sort_action="native",
+                    style_cell={'textAlign': 'left'},
+                    style_data={
+                        'whiteSpace': 'normal',
+                        'height': 'auto',
+                    }
                 )
             ])
 
+data_exp_thematiques_acp = pd.read_csv("../visualisation/data/extracted_data.csv")
+tab_exp_thematiques_acp = html.Div(children=[
+                html.H3(children='Les différentes thématiques associées ensembles'),
+                dt.DataTable(
+                    id='tab',
+                    editable=True,
+                    columns=[{"name": i, "id": i} for i in data_exp_thematiques_acp.iloc[:, 0:5]],
+                    data=data_exp_thematiques_acp.head().to_dict('records'),
+                    sort_action="native",
+                    style_cell={'textAlign': 'left'},
+                    style_data={
+                        'whiteSpace': 'normal',
+                        'height': 'auto',
+                    }
+                )
+            ])
 
 # Permet de mettre à jour la page selon le lien
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
@@ -184,12 +329,19 @@ def render_page_content(pathname):
     elif pathname == "/formatage":
         return html.Div(children=[
             header,
+            formatage_page,
             footer
         ])
-    elif pathname == "/thematiquesCount":
+    elif pathname == "/mapReduce":
         return html.Div(children=[
             header,
-            thematiquesCount,
+            map_reduce_page,
+            footer
+        ])
+    elif pathname == "/extractThematiques":
+        return html.Div(children=[
+            header,
+            extract_thematiques_page,
             footer
         ])
     elif pathname == "/patternsFrequents":

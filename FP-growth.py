@@ -75,17 +75,13 @@ if __name__ == '__main__':
                     set(patterns_df['pattern'][iter1]).issubset(patterns_df['pattern'][iter2]):
                 countSubsets += 1
                 # On regarde s'ils ont le même count (=> petit ensemble non utile)
-                # Ou si le rapport des count est proche (90%)
-                print("Proches ? %f" % (patterns_df['count'][iter2] / patterns_df['count'][iter1]))
+                # Ou si le rapport des count est proche (50%)
                 if patterns_df['count'][iter1] == patterns_df['count'][iter2] or\
-                    patterns_df['count'][iter2]/patterns_df['count'][iter1] >= 0.8:
+                    patterns_df['count'][iter2]/patterns_df['count'][iter1] >= 0.5:
                         countSameCount += 1
             iter2 += 1
-        print("On a %d pour %d proches" %(countSubsets,countSameCount))
         if countSameCount == countSubsets and countSubsets != 0:
             # Notre petit sous-ensemble est négligeable
-            print("On enlève :");
-            print(patterns_df['pattern'][iter1])
             unwanted_patterns.append(iter1)
         iter1 += 1
     # On enlève les patterns inutiles
@@ -108,13 +104,13 @@ if __name__ == '__main__':
         A_df.append(pattern)
         B_df.append(rules.get(pattern)[0])
         conf_df.append(rules.get(pattern)[1])
-        support_df.append(patterns.get(pattern))
+        support_df.append(patterns.get(rules.get(pattern)[0]))
 
     # On les ajoute dans le tableau
     rules_df['A'] = A_df
     rules_df['B'] = B_df
     rules_df['confiance'] = conf_df
-    rules_df['support'] = support_df
+    rules_df['supportB'] = support_df
     rules_df['lift'] = rules_df["confiance"] / rules_df["support"]
     rules_df.sort_values(by=['lift'])
 
