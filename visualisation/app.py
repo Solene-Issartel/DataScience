@@ -322,13 +322,46 @@ tab_exp_thematiques_acp = html.Div(children=[
 
 layoutNuageInd = html.Div([
     html.H3("Nuage des individus"),
-    html.Img(src=app.get_asset_url('nuageIndiv.png'))
+    html.Img(src=app.get_asset_url('nuageIndiv.png'),style={'width': '500px', 'height' : '800px', 'text-align': 'center'})
 ])
 
 layoutNuageVar = html.Div([
     html.H3("Nuage des variables"),
-    html.Img(src=app.get_asset_url('nuageVar.png'))
+    html.Img(src=app.get_asset_url('nuageVar.png'),style={'width': '500px', 'height' : '500px', 'text-align': 'center'})
 ])
+
+acp_layout = html.Div(children=[
+    html.H2('X- ACP'),
+    html.H3('1) Préparation de l\'ACP'),
+    html.P("Pourquoi faire une ACP ?"),
+    html.P("   ---> Nous avons choisis de faire une ACP afin de :"),
+    html.Ul(children=[
+        html.Li("Représenter les 73 individus sur 2 dimensions"),
+        html.Li("Représenter les 66 thématiques sur 2 dimensions"),
+        html.Li("Voir si on peut meetre en lien les individus et les thématiques"),
+        html.Li("Identifier des individus atypiques ou des comportements moyens")
+    ]),
+    html.Hr(),
+    html.H3('2) Tableau des données'),
+    tab_exp_thematiques_acp,
+    html.Hr(),
+    html.H3('3) Résultats de l\'ACP'),
+    layoutNuageInd,
+    html.Hr(),
+    layoutNuageVar,
+    html.Hr(),
+    html.H3('4) Critiques'),
+    html.Ul(children=[
+        html.Li("60% de perte de données"),
+        html.Li("Nous n'avons pu analyser que peu d’individus => 8 individus sur 73"),
+        html.Li("Thématiques => majorité sur l'axe 1"),
+        html.Li("Individus => majorité sur au centre du graphe"),
+    ]),
+    html.H6('Important : toutes les interprétations faites ne sont pas fiables.'),
+    html.Hr(),
+])
+
+
 
 # Permet de mettre à jour la page selon le lien
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
@@ -362,8 +395,7 @@ def render_page_content(pathname):
     elif pathname == "/acp":
         return html.Div(children=[
             header,
-            layoutNuageInd,
-            layoutNuageVar
+            acp_layout
         ])
     # Si l'utilisateur veut rejoindre une page non existante
     return dbc.Jumbotron(
