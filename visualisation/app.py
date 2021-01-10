@@ -27,7 +27,8 @@ SIDEBAR_STYLE = {
     "bottom": 0,
     "width": "16rem",
     "padding": "2rem 1rem",
-    "background-color": "#17a2b8"
+    "background-color": "#17a2b8",
+    "color": "white"
 }
 
 # Style du contenu
@@ -54,12 +55,13 @@ sidebar = html.Div(
         ),
         dbc.Nav(
             [
-                dbc.NavLink("Introduction", href="/", active="exact"),
-                dbc.NavLink("1- Formatage des données", href="/formatage", active="exact"),
-                dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact"),
-                dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact"),
-                dbc.NavLink("4- Patterns Fréquents", href="/patternsFrequents", active="exact"),
-                dbc.NavLink("5- ACP", href="/acp", active="exact")
+                dbc.NavLink("Introduction", href="/", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("1- Formatage des données", href="/formatage", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact",
+                            style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("4- Patterns Fréquents", href="/patternsFrequents", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("5- ACP", href="/acp", active="exact", style={"color": "white", 'font-weight': 'bold'})
             ],
             vertical=True,
             pills=True,
@@ -86,21 +88,24 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 cardPresentationUs = dbc.Card(
     dbc.CardBody([
         html.H6('A propos', className='card-title'),
-        html.P('Bonjour, nous sommes trois élèves de Polytech Montpellier en Informatique et Gestion.',
+        html.P('Dans le cadre de notre projet Data Science à l\'école d\'ingénieur Polytech Montpellier, nous avons '
+               'réalisé ce site intéractif afin de présenter nos résultats. Ce projet s\'inscrit dans '
+               'l\'apprentissage des matières de Data Mining et de Statistiques que nous abordons lors de notre 4ème '
+               'Année du cycle ingénieur',
                className='card-text')
     ])
 )
 cardPresentationProject = dbc.Card(
     dbc.CardBody([
         html.H6('Description du projet', className='card-title'),
-        html.P("Nous analysons des mails afin d'extraire "
-               "des thématiques (contenus dans les sujets) "
-               "et des personnes (destinataire, expéditeur)",
+        html.P("Le sujet de notre projet porte sur l'analyse des mails afin d'en extraire "
+               "des thématiques (présentes dans les sujets des mails) "
+               "et des personnes qui intéragissent avec ces thématiques (les destinataire)",
                className='card-text'
                ),
         html.P("Ainsi, nous allons chercher à mettre en évidence "
                "des liens entre ces thématiques, et également des liens"
-               " entre les expéditeurs et les thématiques qu'ils traitent.",
+               " entre les destinataires et les thématiques qu'ils utilisent dans leurs mails.",
                className='card-text'
                )
     ])
@@ -193,7 +198,7 @@ formatage_page = html.Div(children=[
     ]),
     html.Hr(),
     html.P("Nous nous retrouvons avec %d mails, au lieu de %d mails." % (len(donnees_formatees), len(donnees_brutes))),
-    html.P("Les données semblaient assez \"propres\", car nous avons retirés que très peu de mails."),
+    html.P("Les données semblaient assez \"propres\", car nous avons retiré que très peu de mails."),
     html.H3('2) Aperçu de nos données formatées'),
     dt.DataTable(
         id='tabDataFormated',
