@@ -27,7 +27,8 @@ SIDEBAR_STYLE = {
     "bottom": 0,
     "width": "16rem",
     "padding": "2rem 1rem",
-    "background-color": "#17a2b8"
+    "background-color": "#17a2b8",
+    "color": "white"
 }
 
 # Style du contenu
@@ -54,12 +55,13 @@ sidebar = html.Div(
         ),
         dbc.Nav(
             [
-                dbc.NavLink("Introduction", href="/", active="exact"),
-                dbc.NavLink("1- Formatage des données", href="/formatage", active="exact"),
-                dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact"),
-                dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact"),
-                dbc.NavLink("4- Patterns Fréquents", href="/patternsFrequents", active="exact"),
-                dbc.NavLink("5- ACP", href="/acp", active="exact")
+                dbc.NavLink("Introduction", href="/", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("1- Formatage des données", href="/formatage", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact",
+                            style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("4- Patterns Fréquents", href="/patternsFrequents", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("5- ACP", href="/acp", active="exact", style={"color": "white", 'font-weight': 'bold'})
             ],
             vertical=True,
             pills=True,
@@ -181,7 +183,7 @@ formatage_page = html.Div(children=[
     ]),
     html.Hr(),
     html.P("Nous nous retrouvons avec %d mails, au lieu de %d mails." % (len(donnees_formatees), len(donnees_brutes))),
-    html.P("Les données semblaient assez \"propres\", car nous avons retirés que très peu de mails."),
+    html.P("Les données semblaient assez \"propres\", car nous avons retiré que très peu de mails."),
     html.H3('2) Aperçu de nos données formatées'),
     dt.DataTable(
         id='tabDataFormated',
