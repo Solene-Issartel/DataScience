@@ -124,9 +124,6 @@ presentation = dbc.CardDeck(
      dbc.Card(cardPresentationProject, color="info", outline=False),
      dbc.Card(cardPresentationPbm, color="info", outline=False)],
 )
-LOGOS_STYLE = {
-    "textAlign" : "center"
-}
 logos = html.Div([
     dbc.Row(
             [
