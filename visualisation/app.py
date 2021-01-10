@@ -322,12 +322,12 @@ tab_exp_thematiques_acp = html.Div(children=[
 
 layoutNuageInd = html.Div([
     html.H3("Nuage des individus"),
-    html.Img(src=app.get_asset_url('nuageIndiv.png'),style={'width': '500px', 'height' : '800px', 'text-align': 'center'})
+    html.Img(src=app.get_asset_url('nuageIndiv.png'), style={'width': '60%', 'textAlign': 'center'})
 ])
 
 layoutNuageVar = html.Div([
     html.H3("Nuage des variables"),
-    html.Img(src=app.get_asset_url('nuageVar.png'),style={'width': '500px', 'height' : '500px', 'text-align': 'center'})
+    html.Img(src=app.get_asset_url('nuageVar.png'), style={'width': '60%', 'textAlign': 'center'})
 ])
 
 acp_layout = html.Div(children=[
