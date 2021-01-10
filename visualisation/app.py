@@ -11,7 +11,7 @@ import itertools
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-app.title='DataScience-Thématiques'
+app.title = 'DataScience-Thématiques'
 
 # Style du footer
 FOOTER_STYLE = {
@@ -37,13 +37,12 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
-
 footer = html.Footer(id="footer", children=[
     html.Hr(),
     html.H6('Luc Raymond'),
     html.H6('Solène Issartel'),
     html.H6('Laura Biasibetti')],
-    style=FOOTER_STYLE)
+                     style=FOOTER_STYLE)
 
 # Notre menu de navigation à gauche
 sidebar = html.Div(
@@ -55,12 +54,12 @@ sidebar = html.Div(
         ),
         dbc.Nav(
             [
-                dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink("Introduction", href="/", active="exact"),
                 dbc.NavLink("1- Formatage des données", href="/formatage", active="exact"),
                 dbc.NavLink("2- Thématiques : MapReduce", href="/mapReduce", active="exact"),
                 dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact"),
-                dbc.NavLink("N- Patterns Fréquents", href="/patternsFrequents", active="exact"),
-                dbc.NavLink("X- ACP", href="/acp", active="exact")
+                dbc.NavLink("4- Patterns Fréquents", href="/patternsFrequents", active="exact"),
+                dbc.NavLink("5- ACP", href="/acp", active="exact")
             ],
             vertical=True,
             pills=True,
@@ -88,7 +87,7 @@ cardPresentationUs = dbc.Card(
     dbc.CardBody([
         html.H6('A propos', className='card-title'),
         html.P('Bonjour, nous sommes trois élèves de Polytech Montpellier en Informatique et Gestion.',
-            className='card-text')
+               className='card-text')
     ])
 )
 cardPresentationProject = dbc.Card(
@@ -96,9 +95,12 @@ cardPresentationProject = dbc.Card(
         html.H6('Description du projet', className='card-title'),
         html.P("Nous analysons des mails afin d'extraire "
                "des thématiques (contenus dans les sujets) "
-               "et des personnes (destinataire, expéditeur) "
-               "Ainsi nous pouvons établir des corrélations "
-               "entre ces différents éléments.",
+               "et des personnes (destinataire, expéditeur)",
+               className='card-text'
+               ),
+        html.P("Ainsi, nous allons chercher à mettre en évidence "
+               "des liens entre ces thématiques, et également des liens"
+               " entre les expéditeurs et les thématiques qu'ils traitent.",
                className='card-text'
                )
     ])
@@ -109,7 +111,7 @@ cardPresentationPbm = dbc.Card(
         html.P('- Formatage des données '),
         html.P('- Extraire les données (thématiques et personnes) '),
         html.P("- Exécuter des méthodes d'analyse "),
-        html.P('- Interpréation')
+        html.P('- Interprétation')
     ])
 )
 presentation = dbc.CardDeck(
@@ -117,6 +119,7 @@ presentation = dbc.CardDeck(
      dbc.Card(cardPresentationProject, color="info", outline=False),
      dbc.Card(cardPresentationPbm, color="info", outline=False)],
 )
+
 
 # La page avec les thématiques
 def extractThemsCount():
@@ -129,7 +132,7 @@ def extractThemsCount():
         dic = {}
         for line in read:
             # La première ligne correspond aux titres
-            if (i == 0) :
+            if (i == 0):
                 i = 1
             else:
                 dic[line[1]] = len((line[2]).split(","))
@@ -144,6 +147,8 @@ def extractTabThemsCount(number):
     datas = extractThemsCount()
     dic = dict(itertools.islice(datas[1].items(), number))
     return [datas[0], dic.keys(), dic.values()]
+
+
 # On utilise les méthodes afin de les envoyer au dashboard
 data = extractTabThemsCount(10)
 
@@ -271,8 +276,8 @@ extract_thematiques_page = html.Div(children=[
             'whiteSpace': 'normal',
             'height': 'auto',
         },
-        columns=[{"name": i, "id": i} for i in clean_thematiques_data.iloc[:1:3]],
-        data=clean_thematiques_data[:20].to_dict('records'),
+        columns=[{"name": i, "id": i} for i in clean_thematiques_data.iloc[:, 1:3]],
+        data=clean_thematiques_data[:10].to_dict('records'),
         sort_action="native"
     ),
     html.Hr(),
@@ -282,43 +287,64 @@ extract_thematiques_page = html.Div(children=[
                 " qui ne devraient pas vraiment l'être (trop de mots dans une thématique),"),
         html.Li("Beaucoup de thématiques composées d'un seul mot")
     ]),
+    html.Hr(),
     thematiquesCount,
     html.Hr(),
 ])
 
 # La page pour les patterns fréquents
 itemsets = pd.read_csv("data/itemsetsFrequents.csv", low_memory=False, header=0)
+mails_thematiques = pd.read_csv("data/mails_thematiques.csv")
 patternsFrequents = html.Div(children=[
-                html.H3(children='Les différentes thématiques associées ensembles'),
-                dt.DataTable(
-                    id='table',
-                    columns=[{"name": i, "id": i} for i in itemsets.iloc[:, 1:3]],
-                    data=itemsets.to_dict('records'),
-                    sort_action="native",
-                    style_cell={'textAlign': 'left'},
-                    style_data={
-                        'whiteSpace': 'normal',
-                        'height': 'auto',
-                    }
-                )
-            ])
+    html.H2('4- Patterns fréquents'),
+    html.H3('1) Les différentes étapes pour déterminer les patterns fréquents'),
+    html.Ul(children=[
+        html.Li("1 Associer les mail aux thématiques (Pour chaque mail, on regarde s'il contient, "
+                "pour chaque thématique, un des mots la composant. "
+                "Chaque mail se voit donc associé à une liste de thématiques),"),
+        html.Li("2 Faire ressortir les itemsets fréquents à l'aide de la librairie fp_growth,"),
+        html.Li("3 Garder les itemsets ressortant au moins 100 fois")
+    ]),
+    html.Hr(),
+    html.P("Nous nous retrouvons avec %d mails comportant des thématiques." % (len(mails_thematiques))),
+    html.H3(children='2) Les différentes thématiques associées ensembles'),
+    dt.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in itemsets.iloc[:, 1:3]],
+        data=itemsets.to_dict('records'),
+        sort_action="native",
+        style_cell={'textAlign': 'left'},
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        }
+    ),
+    html.Hr(),
+    html.H3(children='3) Critique de notre fp-growth'),
+    html.Ul(children=[
+        html.Li("On a seulement gardé les mails comportant au moins une thématique => 70% des mails en moins "),
+        html.Li("Algorithme pour associer les thématiques au mail glouton => 8min40s"),
+        html.Li("Qualité douteuse de certaines thématiques => 'meeting', biaise un peu nos résultats"),
+    ]),
+    html.Hr()
+])
 
 data_exp_thematiques_acp = pd.read_csv("../visualisation/data/extracted_data.csv")
 tab_exp_thematiques_acp = html.Div(children=[
-                html.H3(children='Les différentes thématiques associées ensembles'),
-                dt.DataTable(
-                    id='tab',
-                    editable=True,
-                    columns=[{"name": i, "id": i} for i in data_exp_thematiques_acp.iloc[:, 0:5]],
-                    data=data_exp_thematiques_acp.head().to_dict('records'),
-                    sort_action="native",
-                    style_cell={'textAlign': 'left'},
-                    style_data={
-                        'whiteSpace': 'normal',
-                        'height': 'auto',
-                    }
-                )
-            ])
+    html.H3(children='Les différentes thématiques associées ensembles'),
+    dt.DataTable(
+        id='tab',
+        editable=True,
+        columns=[{"name": i, "id": i} for i in data_exp_thematiques_acp.iloc[:, 0:5]],
+        data=data_exp_thematiques_acp.head().to_dict('records'),
+        sort_action="native",
+        style_cell={'textAlign': 'left'},
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        }
+    )
+])
 
 layoutNuageInd = html.Div([
     html.H3("Nuage des individus"),
@@ -355,13 +381,11 @@ acp_layout = html.Div(children=[
         html.Li("60% de perte de données"),
         html.Li("Nous n'avons pu analyser que peu d’individus => 8 individus sur 73"),
         html.Li("Thématiques => majorité sur l'axe 1"),
-        html.Li("Individus => majorité sur au centre du graphe"),
+        html.Li("Individus => majorité au centre du graphe"),
     ]),
     html.H6('Important : toutes les interprétations faites ne sont pas fiables.'),
     html.Hr(),
 ])
-
-
 
 # Permet de mettre à jour la page selon le lien
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
