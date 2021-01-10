@@ -88,21 +88,24 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 cardPresentationUs = dbc.Card(
     dbc.CardBody([
         html.H6('A propos', className='card-title'),
-        html.P('Bonjour, nous sommes trois élèves de Polytech Montpellier en Informatique et Gestion.',
+        html.P('Dans le cadre de notre projet Data Science à l\'école d\'ingénieur Polytech Montpellier, nous avons '
+               'réalisé ce site intéractif afin de présenter nos résultats. Ce projet s\'inscrit dans '
+               'l\'apprentissage des matières de Data Mining et de Statistiques que nous abordons lors de notre 4ème '
+               'Année du cycle ingénieur',
                className='card-text')
     ])
 )
 cardPresentationProject = dbc.Card(
     dbc.CardBody([
         html.H6('Description du projet', className='card-title'),
-        html.P("Nous analysons des mails afin d'extraire "
-               "des thématiques (contenus dans les sujets) "
-               "et des personnes (destinataire, expéditeur)",
+        html.P("Le sujet de notre projet porte sur l'analyse des mails afin d'en extraire "
+               "des thématiques (présentes dans les sujets des mails) "
+               "et des personnes qui intéragissent avec ces thématiques (les destinataire)",
                className='card-text'
                ),
         html.P("Ainsi, nous allons chercher à mettre en évidence "
                "des liens entre ces thématiques, et également des liens"
-               " entre les expéditeurs et les thématiques qu'ils traitent.",
+               " entre les destinataires et les thématiques qu'ils utilisent dans leurs mails.",
                className='card-text'
                )
     ])
