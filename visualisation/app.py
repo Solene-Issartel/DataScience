@@ -119,6 +119,18 @@ presentation = dbc.CardDeck(
      dbc.Card(cardPresentationProject, color="info", outline=False),
      dbc.Card(cardPresentationPbm, color="info", outline=False)],
 )
+LOGOS_STYLE = {
+    "textAlign" : "center"
+}
+logos = html.Div([
+    dbc.Row(
+            [
+                dbc.Col(html.Img(src=app.get_asset_url('polytech.png'), style={'width': '80%'})),
+                dbc.Col( html.Img(src=app.get_asset_url('enron.png'), style={'width': '40%'})),
+                dbc.Col( html.Img(src=app.get_asset_url('ig.png'), style={'width': '50%'}))
+            ]
+    )
+], style={'textAlign':'center'})
 
 
 # La page avec les thématiques
@@ -394,7 +406,8 @@ def render_page_content(pathname):
         return html.Div(children=[
             header,
             html.H4('Présentation'),
-            presentation
+            presentation,
+            logos
         ])
     elif pathname == "/formatage":
         return html.Div(children=[
