@@ -8,6 +8,9 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import itertools
+
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 from whitenoise import WhiteNoise
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -374,6 +377,21 @@ tab_exp_thematiques_acp = html.Div(children=[
     )
 ])
 
+def valeurs_propres(df):
+    X = df
+    # transformation – centrage
+    acp = PCA(svd_solver='full')
+    eigenvalues = acp.explained_variance_ratio_[:10]
+    return eigenvalues
+
+dfVP = valeurs_propres(data_exp_thematiques_acp)
+figVP = px.bar(dfVP, x="Valeurs propres", y="Part d\'inertie'")
+count_val_propres = html.Div(children=[
+    html.H5(children='Les parts d\'inertie des valeurs propres'),
+    dcc.Graph(
+        figure=figVP
+    )])
+
 layoutNuageInd = html.Div([
     html.H3("Nuage des individus"),
     html.Img(src='nuageIndiv.png', style={'width': '60%', 'textAlign': 'center'})
@@ -399,12 +417,15 @@ acp_layout = html.Div(children=[
     tab_exp_thematiques_acp,
     html.Hr(),
     count_mail_exp,
-    html.H3('3) Résultats de l\'ACP'),
+    html.H3('3) Les valeurs propres'),
+    count_val_propres,
+    html.Hr(),
+    html.H3('4) Résultats de l\'ACP'),
     layoutNuageInd,
     html.Hr(),
     layoutNuageVar,
     html.Hr(),
-    html.H3('4) Critiques'),
+    html.H3('5) Critiques'),
     html.Ul(children=[
         html.Li("60% de perte de données,"),
         html.Li("Nous n'avons pu analyser que peu d’individus => 8 individus sur 73,"),
