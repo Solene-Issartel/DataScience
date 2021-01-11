@@ -8,10 +8,14 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import itertools
+from whitenoise import WhiteNoise
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.title = 'DataScience-Thématiques'
+
+server = app.server
+server.wsgi_app = WhiteNoise(server.wsgi_app, root='static/')
 
 # Style du footer
 FOOTER_STYLE = {
@@ -40,10 +44,10 @@ CONTENT_STYLE = {
 
 footer = html.Footer(id="footer", children=[
     html.Hr(),
-    html.H6('Luc Raymond'),
+    html.H6('Laura Biasibetti'),
     html.H6('Solène Issartel'),
-    html.H6('Laura Biasibetti')],
-                     style=FOOTER_STYLE)
+    html.H6('Luc Raymond')
+], style=FOOTER_STYLE)
 
 # Notre menu de navigation à gauche
 sidebar = html.Div(
@@ -89,9 +93,10 @@ cardPresentationUs = dbc.Card(
     dbc.CardBody([
         html.H6('A propos', className='card-title'),
         html.P('Dans le cadre de notre projet Data Science à l\'école d\'ingénieur Polytech Montpellier, nous avons '
-               'réalisé ce site intéractif afin de présenter nos résultats. Ce projet s\'inscrit dans '
-               'l\'apprentissage des matières de Data Mining et de Statistiques que nous abordons lors de notre 4ème '
-               'Année du cycle ingénieur',
+               'réalisé ce site interactif afin de présenter les étapes de notre travail et nos résultats. ',
+               className='card-text'),
+        html.P('Ce projet s\'inscrit dans l\'apprentissage des matières de Data Mining et de Statistiques que nous '
+               'abordons lors de notre 4ème Année du cycle ingénieur.',
                className='card-text')
     ])
 )
@@ -100,12 +105,12 @@ cardPresentationProject = dbc.Card(
         html.H6('Description du projet', className='card-title'),
         html.P("Le sujet de notre projet porte sur l'analyse des mails afin d'en extraire "
                "des thématiques (présentes dans les sujets des mails) "
-               "et des personnes qui intéragissent avec ces thématiques (les destinataire)",
+               "et des personnes qui intéragissent avec ces thématiques (les expéditeurs)",
                className='card-text'
                ),
         html.P("Ainsi, nous allons chercher à mettre en évidence "
                "des liens entre ces thématiques, et également des liens"
-               " entre les destinataires et les thématiques qu'ils utilisent dans leurs mails.",
+               " entre les expéditeurs et les thématiques qu'ils utilisent dans leurs mails.",
                className='card-text'
                )
     ])
@@ -127,9 +132,9 @@ presentation = dbc.CardDeck(
 logos = html.Div([
     dbc.Row(
             [
-                dbc.Col(html.Img(src=app.get_asset_url('polytech.png'), style={'width': '80%'})),
-                dbc.Col( html.Img(src=app.get_asset_url('enron.png'), style={'width': '40%'})),
-                dbc.Col( html.Img(src=app.get_asset_url('ig.png'), style={'width': '50%'}))
+                dbc.Col(html.Img(src='polytech.png', style={'width': '80%'})),
+                dbc.Col(html.Img(src='enron.png', style={'width': '40%'})),
+                dbc.Col(html.Img(src='ig.png', style={'width': '30%'}))
             ]
     )
 ], style={'textAlign':'center'})
@@ -174,27 +179,26 @@ df = pd.DataFrame({
 figThematique = px.bar(df, x=data[0][0], y=data[0][1])
 
 thematiquesCount = html.Div(children=[
-    html.H5(children='Les premières thématiques avec le nombre de mots la composant'),
+    html.H5(children='Les premières thématiques avec le nombre de mots les composant'),
     dcc.Graph(
         figure=figThematique
     )])
 
 # La page de formatage des données
-donnees_brutes = pd.read_csv("data/donnees_data_science.csv")
 donnees_formatees = pd.read_csv("data/formatted_data.csv")
 formatage_page = html.Div(children=[
     html.H2('1- Formatage des Données'),
     html.H3('1) Suppression des mails n\'étant pas sous un bon format'),
     html.Ul(children=[
         html.Li("On garde seulement les colonnes 'id', 'From', 'To', 'Subject' et 'Content', "
-                "les autres ne nous seront pas utiles par la suite."),
+                "les autres ne nous seront pas utiles par la suite,"),
         html.Li("Formatage des noms des expéditeurs sous la forme début_mail(@mail.com), "
-                "par exemple, “phillip.allen@enron.com” devient phillip.allen."),
-        html.Li("Suppression des mails qui ne sont pas au bon format de données (décalages, lignes vides etc.)."),
-        html.Li("Suppression des mails qui ne comportent ni contenu ni sujet.")
+                "par exemple, “phillip.allen@enron.com” devient phillip.allen,"),
+        html.Li("Suppression des mails qui ne sont pas au bon format de données (décalages, lignes vides etc.),"),
+        html.Li("Suppression des mails qui ne comportent ni contenu, ni sujet à la fois.")
     ]),
     html.Hr(),
-    html.P("Nous nous retrouvons avec %d mails, au lieu de %d mails." % (len(donnees_formatees), len(donnees_brutes))),
+    html.P("Nous nous retrouvons avec 99 770 mails, au lieu de 100 000 mails."),
     html.P("Les données semblaient assez \"propres\", car nous avons retiré que très peu de mails."),
     html.H3('2) Aperçu de nos données formatées'),
     dt.DataTable(
@@ -224,13 +228,13 @@ map_reduce_page = html.Div(children=[
     html.H3('1) Les différentes étapes de notre MapReduce'),
     html.Ul(children=[
         html.Li("1 Récupération du sujet de tous les mails,"),
-        html.Li("2 Suppression des lignes vides (Pas de sujet),"),
+        html.Li("2 Suppression des lignes vides (Sans sujet),"),
         html.Li("3 Passage des sujets en minuscules, puis split de chaque mot (Nous nous retrouvons avec "
                 "une grande liste de tous les mots rencontrés dans les sujets des mails),"),
         html.Li("4 Enlever les mots inutiles (stop-words),"),
-        html.Li("5 Associer un 1 pour chaque mot,"),
+        html.Li("5 Associer un 1 à chaque mot,"),
         html.Li("6 Réduire les mots identiques et additionner le compteur,"),
-        html.Li("7 Garder uniquement les mots apparaissant au moins 200 fois,")
+        html.Li("7 Garder uniquement les mots apparaissant au moins 200 fois.")
     ]),
     html.Hr(),
     html.P("Nous nous retrouvons avec %d mots différents." % (len(map_reduce_data))),
@@ -253,9 +257,9 @@ map_reduce_page = html.Div(children=[
         sort_action="native"
     ),
     html.Hr(),
-    html.H3('3) Critique de notre MapReduce'),
+    html.H3('3) Critiques de notre MapReduce'),
     html.Ul(children=[
-        html.Li("Toujours des mots ayant peu d'intérêt ('fwd' par exemple), mais peu,"),
+        html.Li("Toujours des mots ayant peu d'intérêt ('fwd' par exemple), mais ils sont peu nombreux,"),
         html.Li("Utilisation seulement du sujet des mails, et non pas du contenu => Pertinence des mots récupérés ?")
     ]),
     html.Hr(),
@@ -272,10 +276,10 @@ extract_thematiques_page = html.Div(children=[
                 " entre 2 mots, et les synonymes d'un mot),"),
         html.Li("- Oui, alors on les regroupe ensemble, "),
         html.Li("- Non, alors on crée une nouvelle thématique comprenant ce mot,"),
-        html.Li("3 Le mot du cluster ressortant le plus donnera son nom à la thématique,")
+        html.Li("3 Le mot du cluster ressortant le plus donnera son nom à la thématique.")
     ]),
     html.Hr(),
-    html.P("Nous nous retrouvons avec %d thématiques différents." % (len(clean_thematiques_data))),
+    html.P("Nous nous retrouvons avec %d thématiques différentes." % (len(clean_thematiques_data))),
     html.H3('2) Aperçu des premières thématiques extraites'),
     dt.DataTable(
         id='tabDataThematiques',
@@ -295,11 +299,11 @@ extract_thematiques_page = html.Div(children=[
         sort_action="native"
     ),
     html.Hr(),
-    html.H3('3) Critique de notre extraction de thématiques'),
+    html.H3('3) Critiques de notre extraction de thématiques'),
     html.Ul(children=[
-        html.Li("Mots proches si au moins 65% similaires (faible) => des mots regroupés ensembles"
-                " qui ne devraient pas vraiment l'être (trop de mots dans une thématique),"),
-        html.Li("Beaucoup de thématiques composées d'un seul mot")
+        html.Li("Mots proches si similaires au moins à 65% (assez faible) => des mots regroupés ensembles"
+                " qui ne devraient pas vraiment l'être (trop de mots dans une même thématique),"),
+        html.Li("Beaucoup de thématiques composées d'un seul mot.")
     ]),
     html.Hr(),
     thematiquesCount,
@@ -313,11 +317,11 @@ patternsFrequents = html.Div(children=[
     html.H2('4- Patterns fréquents'),
     html.H3('1) Les différentes étapes pour déterminer les patterns fréquents'),
     html.Ul(children=[
-        html.Li("1 Associer les mail aux thématiques (Pour chaque mail, on regarde s'il contient, "
+        html.Li("1 Associer les mails aux thématiques (Pour chaque mail, on regarde s'il contient, "
                 "pour chaque thématique, un des mots la composant. "
                 "Chaque mail se voit donc associé à une liste de thématiques),"),
         html.Li("2 Faire ressortir les itemsets fréquents à l'aide de la librairie fp_growth,"),
-        html.Li("3 Garder les itemsets ressortant au moins 100 fois")
+        html.Li("3 Garder les itemsets ressortant au moins 100 fois.")
     ]),
     html.Hr(),
     html.P("Nous nous retrouvons avec %d mails comportant des thématiques." % (len(mails_thematiques))),
@@ -334,21 +338,31 @@ patternsFrequents = html.Div(children=[
         }
     ),
     html.Hr(),
-    html.H3(children='3) Critique de notre fp-growth'),
+    html.H3(children='3) Critiques de notre fp-growth'),
     html.Ul(children=[
-        html.Li("On a seulement gardé les mails comportant au moins une thématique => 70% des mails en moins "),
-        html.Li("Algorithme pour associer les thématiques au mail glouton => 8min40s"),
-        html.Li("Qualité douteuse de certaines thématiques => 'meeting', biaise un peu nos résultats"),
+        html.Li("On a seulement gardé les mails comportant au moins une thématique => 70% des mails en moins,"),
+        html.Li("Algorithme pour associer les thématiques au mail glouton => 8min40s,"),
+        html.Li("Qualité douteuse de certaines thématiques => 'meeting', biaise un peu nos résultats."),
     ]),
     html.Hr()
 ])
 
-data_exp_thematiques_acp = pd.read_csv("../visualisation/data/extracted_data.csv")
+
+data_exp = pd.read_csv("data/exp_mails.csv")
+data_exp = data_exp[["From","Nombre d'emails envoyés"]].sort_values(by=['Nombre d\'emails envoyés'],ascending=False)
+
+figExp = px.bar(data_exp, x="From", y="Nombre d'emails envoyés")
+
+count_mail_exp = html.Div(children=[
+    html.H5(children='Le nombre d\'emails envoyé pour chaque expéditeur'),
+    dcc.Graph(
+        figure=figExp
+    )])
+
+data_exp_thematiques_acp = pd.read_csv("data/extracted_data.csv")
 tab_exp_thematiques_acp = html.Div(children=[
-    html.H3(children='Les différentes thématiques associées ensembles'),
     dt.DataTable(
         id='tab',
-        editable=True,
         columns=[{"name": i, "id": i} for i in data_exp_thematiques_acp.iloc[:, 0:5]],
         data=data_exp_thematiques_acp.head().to_dict('records'),
         sort_action="native",
@@ -362,29 +376,29 @@ tab_exp_thematiques_acp = html.Div(children=[
 
 layoutNuageInd = html.Div([
     html.H3("Nuage des individus"),
-    html.Img(src=app.get_asset_url('nuageIndiv.png'), style={'width': '60%', 'textAlign': 'center'})
+    html.Img(src='nuageIndiv.png', style={'width': '60%', 'textAlign': 'center'})
 ])
 
 layoutNuageVar = html.Div([
     html.H3("Nuage des variables"),
-    html.Img(src=app.get_asset_url('nuageVar.png'), style={'width': '60%', 'textAlign': 'center'})
+    html.Img(src='nuageVar.png', style={'width': '60%', 'textAlign': 'center'})
 ])
 
 acp_layout = html.Div(children=[
-    html.H2('X- ACP'),
+    html.H2('5- ACP'),
     html.H3('1) Préparation de l\'ACP'),
-    html.P("Pourquoi faire une ACP ?"),
-    html.P("   ---> Nous avons choisis de faire une ACP afin de :"),
+    html.P("Nous avons choisi de faire une ACP afin de :"),
     html.Ul(children=[
-        html.Li("Représenter les 73 individus sur 2 dimensions"),
-        html.Li("Représenter les 66 thématiques sur 2 dimensions"),
-        html.Li("Voir si on peut meetre en lien les individus et les thématiques"),
-        html.Li("Identifier des individus atypiques ou des comportements moyens")
+        html.Li("Représenter les 73 individus sur 2 dimensions,"),
+        html.Li("Représenter les 66 thématiques sur 2 dimensions,"),
+        html.Li("Voir si on peut mettre en lien les individus et les thématiques,"),
+        html.Li("Identifier des individus atypiques ou des comportements moyens.")
     ]),
     html.Hr(),
-    html.H3('2) Tableau des données'),
+    html.H3('2) Tableau de données des individus, et du nombre de fois qu\'ils traitent chaque thématique'),
     tab_exp_thematiques_acp,
     html.Hr(),
+    count_mail_exp,
     html.H3('3) Résultats de l\'ACP'),
     layoutNuageInd,
     html.Hr(),
@@ -392,12 +406,12 @@ acp_layout = html.Div(children=[
     html.Hr(),
     html.H3('4) Critiques'),
     html.Ul(children=[
-        html.Li("60% de perte de données"),
-        html.Li("Nous n'avons pu analyser que peu d’individus => 8 individus sur 73"),
-        html.Li("Thématiques => majorité sur l'axe 1"),
-        html.Li("Individus => majorité au centre du graphe"),
+        html.Li("60% de perte de données,"),
+        html.Li("Nous n'avons pu analyser que peu d’individus => 8 individus sur 73,"),
+        html.Li("Thématiques => majorité sur l'axe 1,"),
+        html.Li("Individus => majorité au centre du graphe."),
     ]),
-    html.H6('Important : toutes les interprétations faites ne sont pas fiables.'),
+    html.H6('Important : toutes les interprétations faites ne sont pas vraiment fiables.'),
     html.Hr(),
 ])
 

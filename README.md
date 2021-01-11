@@ -1,6 +1,7 @@
-# DataScience
+# Projet DataScience
 
-## Pre conditions
+## BIASIBETTI Laura, ISSARTEL Solène, RAYMOND Luc
 
-It's important to create a directory **data** in wich you will have your datasets (too big to be in Github).
-In this project, the dataset is named *donnes_data_science.csv*.
+Voici le git que nous avons utilisé tout au long du projet.
+
+Lien vers la web application : https://dash-app-data-science.herokuapp.com/
