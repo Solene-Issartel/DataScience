@@ -33,7 +33,7 @@ def extract_data(csv_file):
     mails_df["Dictionnaire des thématiques"] = list_dic
     mails_df = mails_df.query('Thematiques>=50')
     mails_df = mails_df.rename(columns={"Thematiques": "Nombre d\'emails envoyés"})
-    print(mails_df)
+    mails_df.to_csv("visualisation/data/exp_mails.csv")
     return mails_df
 
 
@@ -67,6 +67,7 @@ def tableau_acp(dataframe):
         expThematiques = pandas.concat([expThematiques, newExpRow], ignore_index=True)
     # On a fini d'attribuer les différentes thématiques aux expéditeurs
     expThematiques.index = list_exp
+    expThematiques = expThematiques.rename(index={'null': 'From'})
     print(expThematiques)
     return expThematiques
 
