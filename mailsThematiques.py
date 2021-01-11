@@ -13,7 +13,7 @@ def retrieve_associated_words(stringToChange):
     wordsAssociated = wordsAssociated.split(" ")
     return wordsAssociated
 
-# Selon son sujet²²
+# Selon son sujet
 def associate_to_mails():
     start_time = time.time()
     df = pandas.read_csv("visualisation/data/formatted_data.csv", low_memory=False, header=0)

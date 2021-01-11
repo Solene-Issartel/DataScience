@@ -68,7 +68,8 @@ sidebar = html.Div(
                 dbc.NavLink("3- Thématiques : Extraction", href="/extractThematiques", active="exact",
                             style={"color": "white", 'font-weight': 'bold'}),
                 dbc.NavLink("4- Patterns Fréquents", href="/patternsFrequents", active="exact", style={"color": "white", 'font-weight': 'bold'}),
-                dbc.NavLink("5- ACP", href="/acp", active="exact", style={"color": "white", 'font-weight': 'bold'})
+                dbc.NavLink("5- ACP", href="/acp", active="exact", style={"color": "white", 'font-weight': 'bold'}),
+                dbc.NavLink("6- Amélioration : correction de nos analyses", href="/ameliorationCorrection", active="exact", style={"color": "white", 'font-weight': 'bold'})
             ],
             vertical=True,
             pills=True,
@@ -144,8 +145,8 @@ logos = html.Div([
 
 
 # La page avec les thématiques
-def extractThemsCount():
-    with open('data/clean_thematiques.csv', newline='') as f:  # Ouverture du fichier CSV
+def extractThemsCount(csvName):
+    with open(csvName, newline='') as f:  # Ouverture du fichier CSV
         read = csv.reader(f)  # chargement des lignes du fichier csv
         columns_name = ["Thématiques", "Nombre de mots"]
         themes = []
@@ -165,14 +166,14 @@ def extractThemsCount():
     return [columns_name, final_dic]
 
 
-def extractTabThemsCount(number):
-    datas = extractThemsCount()
+def extractTabThemsCount(number,csvName):
+    datas = extractThemsCount(csvName)
     dic = dict(itertools.islice(datas[1].items(), number))
     return [datas[0], dic.keys(), dic.values()]
 
 
 # On utilise les méthodes afin de les envoyer au dashboard
-data = extractTabThemsCount(10)
+data = extractTabThemsCount(10,'data/clean_thematiques.csv')
 
 df = pd.DataFrame({
     data[0][0]: data[1],
@@ -379,15 +380,20 @@ tab_exp_thematiques_acp = html.Div(children=[
 
 def valeurs_propres(df):
     X = df
+    del X['Unnamed: 0']
+    # instanciation
+    sc = StandardScaler()
     # transformation – centrage
+    Z = sc.fit_transform(X)
     acp = PCA(svd_solver='full')
+    coord = acp.fit_transform(Z)
     eigenvalues = acp.explained_variance_ratio_[:10]
     return eigenvalues
 
 dfVP = valeurs_propres(data_exp_thematiques_acp)
-figVP = px.bar(dfVP, x="Valeurs propres", y="Part d\'inertie'")
+figVP = px.bar(dfVP, labels={"index": "Dimension", "value": "Part d'inertie"})
 count_val_propres = html.Div(children=[
-    html.H5(children='Les parts d\'inertie des valeurs propres'),
+    html.H5(children='Les parts d\'inertie des premières valeurs propres'),
     dcc.Graph(
         figure=figVP
     )])
@@ -436,6 +442,79 @@ acp_layout = html.Div(children=[
     html.Hr(),
 ])
 
+
+# On utilise les méthodes afin de les envoyer au dashboard
+data2 = extractTabThemsCount(10,'data/clean_thematiques2.csv')
+
+df2 = pd.DataFrame({
+    data2[0][0]: data2[1],
+    data2[0][1]: data2[2]
+})
+
+figExp2 = px.bar(df2, x=data2[0][0], y=data2[0][1])
+
+thematiquesCount2 = html.Div(children=[
+    html.H5(children='Les premières thématiques avec le nombre de mots les composant'),
+    dcc.Graph(
+        figure=figExp2
+    )])
+
+data_exp_thematiques_acp2 = pd.read_csv("data/extracted_data2.csv")
+tab_exp_thematiques_acp2 = html.Div(children=[
+    dt.DataTable(
+        id='tab',
+        columns=[{"name": i, "id": i} for i in data_exp_thematiques_acp2.iloc[:, 0:5]],
+        data=data_exp_thematiques_acp2.head().to_dict('records'),
+        sort_action="native",
+        style_cell={'textAlign': 'left'},
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        }
+    )
+])
+
+layoutNuageInd2 = html.Div([
+    html.H3("Nuage des individus"),
+    html.Img(src='nuageIndiv2.png', style={'width': '60%', 'textAlign': 'center'})
+])
+
+layoutNuageVar2 = html.Div([
+    html.H3("Nuage des variables"),
+    html.Img(src='nuageVar2.png', style={'width': '60%', 'textAlign': 'center'})
+])
+
+itemsets2 = pd.read_csv("data/itemsetsFrequents2.csv")
+amelioration_page = html.Div(children=[
+    html.H2('6- Amélioration : correction de nos analyses'),
+    html.H3('1) Meilleure façon d\'associer les mails aux thématiques'),
+    html.P("Nous nous sommes rendus compte au dernier moment que notre association de thématiques aux mails "
+           "était complètement naïve (Se met avec le premier mot proche, sans regarder les autres)"),
+    thematiquesCount2,
+    html.Hr(),
+    html.H3('2) Nouveau tableau de données des individus, et du nombre de fois qu\'ils traitent chaque thématique'),
+    tab_exp_thematiques_acp2,
+    html.Hr(),
+    html.H3(children='3) Les thématiques associées ensembles'),
+    dt.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in itemsets2.iloc[:, 1:3]],
+        data=itemsets2.to_dict('records'),
+        sort_action="native",
+        style_cell={'textAlign': 'left'},
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        }
+    ),
+    html.Hr(),
+    html.H3('4) Nouveaux résultats de l\'ACP'),
+    layoutNuageInd2,
+    html.Hr(),
+    layoutNuageVar2,
+    html.Hr(),
+])
+
 # Permet de mettre à jour la page selon le lien
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
@@ -470,6 +549,11 @@ def render_page_content(pathname):
         return html.Div(children=[
             header,
             acp_layout
+        ])
+    elif pathname == "/ameliorationCorrection":
+        return html.Div(children=[
+            header,
+            amelioration_page
         ])
     # Si l'utilisateur veut rejoindre une page non existante
     return dbc.Jumbotron(
