@@ -8,10 +8,14 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import itertools
+from whitenoise import WhiteNoise
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.title = 'DataScience-Thématiques'
+
+server = app.server
+server.wsgi_app = WhiteNoise(server.wsgi_app, root='static/')
 
 # Style du footer
 FOOTER_STYLE = {
@@ -127,9 +131,9 @@ presentation = dbc.CardDeck(
 logos = html.Div([
     dbc.Row(
             [
-                dbc.Col(html.Img(src=app.get_asset_url('polytech.png'), style={'width': '80%'})),
-                dbc.Col( html.Img(src=app.get_asset_url('enron.png'), style={'width': '40%'})),
-                dbc.Col( html.Img(src=app.get_asset_url('ig.png'), style={'width': '30%'}))
+                dbc.Col(html.Img(src='polytech.png', style={'width': '80%'})),
+                dbc.Col(html.Img(src='enron.png', style={'width': '40%'})),
+                dbc.Col(html.Img(src='ig.png', style={'width': '30%'}))
             ]
     )
 ], style={'textAlign':'center'})
@@ -180,7 +184,6 @@ thematiquesCount = html.Div(children=[
     )])
 
 # La page de formatage des données
-donnees_brutes = pd.read_csv("data/donnees_data_science.csv")
 donnees_formatees = pd.read_csv("data/formatted_data.csv")
 formatage_page = html.Div(children=[
     html.H2('1- Formatage des Données'),
@@ -194,7 +197,7 @@ formatage_page = html.Div(children=[
         html.Li("Suppression des mails qui ne comportent ni contenu ni sujet.")
     ]),
     html.Hr(),
-    html.P("Nous nous retrouvons avec %d mails, au lieu de %d mails." % (len(donnees_formatees), len(donnees_brutes))),
+    html.P("Nous nous retrouvons avec 99 770 mails, au lieu de 100 000 mails."),
     html.P("Les données semblaient assez \"propres\", car nous avons retiré que très peu de mails."),
     html.H3('2) Aperçu de nos données formatées'),
     dt.DataTable(
@@ -355,7 +358,7 @@ count_mail_exp = html.Div(children=[
         figure=figExp
     )])
 
-data_exp_thematiques_acp = pd.read_csv("../visualisation/data/extracted_data.csv")
+data_exp_thematiques_acp = pd.read_csv("data/extracted_data.csv")
 tab_exp_thematiques_acp = html.Div(children=[
     dt.DataTable(
         id='tab',
@@ -372,12 +375,12 @@ tab_exp_thematiques_acp = html.Div(children=[
 
 layoutNuageInd = html.Div([
     html.H3("Nuage des individus"),
-    html.Img(src=app.get_asset_url('nuageIndiv.png'), style={'width': '60%', 'textAlign': 'center'})
+    html.Img(src='nuageIndiv.png', style={'width': '60%', 'textAlign': 'center'})
 ])
 
 layoutNuageVar = html.Div([
     html.H3("Nuage des variables"),
-    html.Img(src=app.get_asset_url('nuageVar.png'), style={'width': '60%', 'textAlign': 'center'})
+    html.Img(src='nuageVar.png', style={'width': '60%', 'textAlign': 'center'})
 ])
 
 acp_layout = html.Div(children=[
