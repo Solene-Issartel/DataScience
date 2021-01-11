@@ -109,9 +109,18 @@ def nuages_individus1(tablePCA):
     # #placement des étiquettes des observations
     n=66
     for i in range(n):
-        plt.annotate(tablePCA.index[i],(coord[i,0],coord[i,1]))#ajouter les axes
+        plt.annotate(tablePCA.index[i],(coord[i,0],coord[i,1]))
+
+    #ajouter les axes
     plt.plot([-4,33],[0,0],color='silver',linestyle='-',linewidth=1)
-    plt.plot([0,0],[-4,33],color='silver',linestyle='-',linewidth=1)#affichage
+    plt.plot([0,0],[-4,33],color='silver',linestyle='-',linewidth=1)
+
+    eigenvalues = acpp.explained_variance_ratio_[:2]
+    plt.xlabel(f"Dim 1 ({round(eigenvalues[0] * 100, 2)}%)")
+    plt.ylabel(f"Dim 2 ({round(eigenvalues[1] * 100, 2)}%)")
+    plt.title('Individual factor map (PCA)')
+
+    #affichage
     plt.show()
 
 def nuages_individus(tabAFC):
